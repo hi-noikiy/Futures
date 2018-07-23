@@ -3,10 +3,78 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Futures"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        
+        Title="Futures" Height="300" Width="500" x:ClassModifier="internal"
+        WindowStartupLocation="CenterScreen">
+    <Grid ShowGridLines="False">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="4*"></RowDefinition>
+            <RowDefinition Height="2*"></RowDefinition>
+            <RowDefinition Height="2*"></RowDefinition>
+            <RowDefinition Height="2*"></RowDefinition>
+            <RowDefinition Height="2*"></RowDefinition>
+            <RowDefinition Height="2*"></RowDefinition>
+            <RowDefinition Height="2*"></RowDefinition>
+            <RowDefinition Height="2*"></RowDefinition>
+            <RowDefinition Height="2*"></RowDefinition>
+            <RowDefinition Height="2*"></RowDefinition>
+        </Grid.RowDefinitions>
+
+        <Label Grid.Row="0" Grid.Column="0" Content="Enter Cumulative:" VerticalAlignment="Top" VerticalContentAlignment="Top" HorizontalContentAlignment="Center" Background="LightSeaGreen" />
+        <Label Grid.Row="1" Grid.Column="0" Content="BTC" VerticalAlignment="Center" Background="Aquamarine" HorizontalContentAlignment="Center" />
+        <Label Grid.Row="2" Grid.Column="0" Content="LTC" VerticalAlignment="Center" Background="Aquamarine" HorizontalContentAlignment="Center" />
+        <Label Grid.Row="3" Grid.Column="0" Content="ETH" VerticalAlignment="Center" Background="Aquamarine" HorizontalContentAlignment="Center" />
+        <Label Grid.Row="4" Grid.Column="0" Content="ETC" VerticalAlignment="Center" Background="Aquamarine" HorizontalContentAlignment="Center" />
+        <Label Grid.Row="5" Grid.Column="0" Content="BCH" VerticalAlignment="Center" Background="Aquamarine" HorizontalContentAlignment="Center" />
+        <Label Grid.Row="6" Grid.Column="0" Content="BTG" VerticalAlignment="Center" Background="Aquamarine" HorizontalContentAlignment="Center" />
+        <Label Grid.Row="7" Grid.Column="0" Content="XRP" VerticalAlignment="Center" Background="Aquamarine" HorizontalContentAlignment="Center" />
+        <Label Grid.Row="8" Grid.Column="0" Content="EOS" VerticalAlignment="Center" Background="Aquamarine" HorizontalContentAlignment="Center" />
+
+        <Label Grid.Row="0" Grid.Column="1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Background="DeepSkyBlue">"This week"</Label>
+        <Label Grid.Row="0" Grid.Column="2" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Background="DeepSkyBlue">"Next week"</Label>
+        <Label Grid.Row="0" Grid.Column="3" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Background="DeepSkyBlue">"Quarter"</Label>
+
+        <TextBox Name="Cumulative" Tag="0" Height="Auto" Grid.Row="0" Grid.Column="0" Text="1" VerticalAlignment="Bottom" HorizontalContentAlignment="Right" />
+
+        <Button Grid.Row="9" Grid.Column="0" Name="Start" Background="SpringGreen" Grid.ColumnSpan="2" Content="Start" FontSize="15" FontStyle="Normal" BorderThickness="2" Click="StartClick" />
+        <Button Grid.Row="9" Grid.Column="2" Name="Stop" Background="IndianRed" Grid.ColumnSpan="2" Content="Stop" FontSize="15" FontStyle="Normal" BorderThickness="2" IsEnabled="False" Click="StopClick" />
+
+        <Label Name="BtcTw" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalContentAlignment="Center">0</Label>
+        <Label Name="BtcNw" Grid.Row="1" Grid.Column="2" VerticalAlignment="Center" HorizontalContentAlignment="Center">0</Label>
+        <Label Name="BtcQ" Grid.Row="1" Grid.Column="3" VerticalAlignment="Center" HorizontalContentAlignment="Center">0</Label>
+
+        <Label Name="LtcTw" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalContentAlignment="Center">0</Label>
+        <Label Name="LtcNw" Grid.Row="2" Grid.Column="2" VerticalAlignment="Center" HorizontalContentAlignment="Center">0</Label>
+        <Label Name="LtcQ" Grid.Row="2" Grid.Column="3" VerticalAlignment="Center" HorizontalContentAlignment="Center">0</Label>
+
+        <Label Name="EthTw" Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" HorizontalContentAlignment="Center">0</Label>
+        <Label Name="EthNw" Grid.Row="3" Grid.Column="2" VerticalAlignment="Center" HorizontalContentAlignment="Center">0</Label>
+        <Label Name="EthQ" Grid.Row="3" Grid.Column="3" VerticalAlignment="Center" HorizontalContentAlignment="Center">0</Label>
+
+        <Label Name="EtcTw" Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" HorizontalContentAlignment="Center">0</Label>
+        <Label Name="EtcNw" Grid.Row="4" Grid.Column="2" VerticalAlignment="Center" HorizontalContentAlignment="Center">0</Label>
+        <Label Name="EtcQ" Grid.Row="4" Grid.Column="3" VerticalAlignment="Center" HorizontalContentAlignment="Center">0</Label>
+
+        <Label Name="BchTw" Grid.Row="5" Grid.Column="1" VerticalAlignment="Center" HorizontalContentAlignment="Center">0</Label>
+        <Label Name="BchNw" Grid.Row="5" Grid.Column="2" VerticalAlignment="Center" HorizontalContentAlignment="Center">0</Label>
+        <Label Name="BchQ" Grid.Row="5" Grid.Column="3" VerticalAlignment="Center" HorizontalContentAlignment="Center">0</Label>
+
+        <Label Name="BtgTw" Grid.Row="6" Grid.Column="1" VerticalAlignment="Center" HorizontalContentAlignment="Center">0</Label>
+        <Label Name="BtgNw" Grid.Row="6" Grid.Column="2" VerticalAlignment="Center" HorizontalContentAlignment="Center">0</Label>
+        <Label Name="BtgQ" Grid.Row="6" Grid.Column="3" VerticalAlignment="Center" HorizontalContentAlignment="Center">0</Label>
+
+        <Label Name="XrpTw" Grid.Row="7" Grid.Column="1" VerticalAlignment="Center" HorizontalContentAlignment="Center">0</Label>
+        <Label Name="XrpNw" Grid.Row="7" Grid.Column="2" VerticalAlignment="Center" HorizontalContentAlignment="Center">0</Label>
+        <Label Name="XrpQ" Grid.Row="7" Grid.Column="3" VerticalAlignment="Center" HorizontalContentAlignment="Center">0</Label>
+
+        <Label Name="EosTw" Grid.Row="8" Grid.Column="1" VerticalAlignment="Center" HorizontalContentAlignment="Center">0</Label>
+        <Label Name="EosNw" Grid.Row="8" Grid.Column="2" VerticalAlignment="Center" HorizontalContentAlignment="Center">0</Label>
+        <Label Name="EosQ" Grid.Row="8" Grid.Column="3" VerticalAlignment="Center" HorizontalContentAlignment="Center">0</Label>
     </Grid>
 </Window>
