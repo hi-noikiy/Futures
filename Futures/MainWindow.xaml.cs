@@ -37,39 +37,39 @@
 
 				#region CurrencyInfo
 
-				const int MarketDepth = 10;
+				var marketDepth = Convert.ToInt32(ConfigurationManager.AppSettings["MarketDepth"]);
 
-				var btcTwResult = await FutureDepthAsync("btc_usd", "this_week", MarketDepth);
-				var btcNwResult = await FutureDepthAsync("btc_usd", "next_week", MarketDepth);
-				var btcQResult = await FutureDepthAsync("btc_usd", "quarter", MarketDepth);
+				var btcTwResult = await FutureDepthBtcAsync("btc_usd", "this_week", marketDepth);
+				var btcNwResult = await FutureDepthBtcAsync("btc_usd", "next_week", marketDepth);
+				var btcQResult = await FutureDepthBtcAsync("btc_usd", "quarter", marketDepth);
 
-				var ltcTwResult = await FutureDepthAsync("ltc_usd", "this_week", MarketDepth);
-				var ltcNwResult = await FutureDepthAsync("ltc_usd", "next_week", MarketDepth);
-				var ltcQResult = await FutureDepthAsync("ltc_usd", "quarter", MarketDepth);
+				var ltcTwResult = await FutureDepthAsync("ltc_usd", "this_week", marketDepth);
+				var ltcNwResult = await FutureDepthAsync("ltc_usd", "next_week", marketDepth);
+				var ltcQResult = await FutureDepthAsync("ltc_usd", "quarter", marketDepth);
 
-				var ethTwResult = await FutureDepthAsync("eth_usd", "this_week", MarketDepth);
-				var ethNwResult = await FutureDepthAsync("eth_usd", "next_week", MarketDepth);
-				var ethQResult = await FutureDepthAsync("eth_usd", "quarter", MarketDepth);
+				var ethTwResult = await FutureDepthAsync("eth_usd", "this_week", marketDepth);
+				var ethNwResult = await FutureDepthAsync("eth_usd", "next_week", marketDepth);
+				var ethQResult = await FutureDepthAsync("eth_usd", "quarter", marketDepth);
 
-				var etcTwResult = await FutureDepthAsync("etc_usd", "this_week", MarketDepth);
-				var etcNwResult = await FutureDepthAsync("etc_usd", "next_week", MarketDepth);
-				var etcQResult = await FutureDepthAsync("etc_usd", "quarter", MarketDepth);
+				var etcTwResult = await FutureDepthAsync("etc_usd", "this_week", marketDepth);
+				var etcNwResult = await FutureDepthAsync("etc_usd", "next_week", marketDepth);
+				var etcQResult = await FutureDepthAsync("etc_usd", "quarter", marketDepth);
 
-				var bchTwResult = await FutureDepthAsync("bch_usd", "this_week", MarketDepth);
-				var bchNwResult = await FutureDepthAsync("bch_usd", "next_week", MarketDepth);
-				var bchQResult = await FutureDepthAsync("bch_usd", "quarter", MarketDepth);
+				var bchTwResult = await FutureDepthAsync("bch_usd", "this_week", marketDepth);
+				var bchNwResult = await FutureDepthAsync("bch_usd", "next_week", marketDepth);
+				var bchQResult = await FutureDepthAsync("bch_usd", "quarter", marketDepth);
 
-				var btgTwResult = await FutureDepthAsync("btg_usd", "this_week", MarketDepth);
-				var btgNwResult = await FutureDepthAsync("btg_usd", "next_week", MarketDepth);
-				var btgQResult = await FutureDepthAsync("btg_usd", "quarter", MarketDepth);
+				var btgTwResult = await FutureDepthAsync("btg_usd", "this_week", marketDepth);
+				var btgNwResult = await FutureDepthAsync("btg_usd", "next_week", marketDepth);
+				var btgQResult = await FutureDepthAsync("btg_usd", "quarter", marketDepth);
 
-				var xrpTwResult = await FutureDepthAsync("xrp_usd", "this_week", MarketDepth);
-				var xrpNwResult = await FutureDepthAsync("xrp_usd", "next_week", MarketDepth);
-				var xrpQResult = await FutureDepthAsync("xrp_usd", "quarter", MarketDepth);
+				var xrpTwResult = await FutureDepthAsync("xrp_usd", "this_week", marketDepth);
+				var xrpNwResult = await FutureDepthAsync("xrp_usd", "next_week", marketDepth);
+				var xrpQResult = await FutureDepthAsync("xrp_usd", "quarter", marketDepth);
 
-				var eosTwResult = await FutureDepthAsync("eos_usd", "this_week", MarketDepth);
-				var eosNwResult = await FutureDepthAsync("eos_usd", "next_week", MarketDepth);
-				var eosQResult = await FutureDepthAsync("eos_usd", "quarter", MarketDepth);
+				var eosTwResult = await FutureDepthAsync("eos_usd", "this_week", marketDepth);
+				var eosNwResult = await FutureDepthAsync("eos_usd", "next_week", marketDepth);
+				var eosQResult = await FutureDepthAsync("eos_usd", "quarter", marketDepth);
 
 				#endregion
 
@@ -182,6 +182,68 @@
 			return futureDepth;
 		}
 
+		public async Task<FutureDepth> FutureDepthBtcAsync(string symbol, string contractType, int size)
+		{
+			var paras = new Dictionary<string, string>
+				            {
+					            { "symbol", symbol },
+					            { "contract_type", contractType },
+					            { "size", size.ToString() }
+				            };
+
+			var url = ConfigurationManager.AppSettings["OkexUrl"] + ConfigurationManager.AppSettings["FutureDepthUrl"];
+			CreateUrl(ref url, paras);
+
+			var request = CreateGetRequest(url);
+			var response = await GetResponseAsync(request);
+			var data = await ReadResponseAsync(response);
+
+			var futureDepth = new FutureDepth();
+			var result = JObject.Parse(data);
+
+			foreach (var itemList in result)
+			{
+				var reverseAsks = itemList.Value.Reverse();
+				double cumulative = 0;
+
+				// ReSharper disable once ConvertIfStatementToSwitchStatement
+				if (itemList.Key == "asks")
+				{
+					foreach (var item in reverseAsks)
+					{
+						var amount = Math.Round(item.Last.Value<double>() * 100 / item.First.Value<double>(), 5);
+						var ask = new FutureDepthDetail
+							          {
+								          Price = item.First.Value<double>(),
+								          Amount = amount,
+								          Cumulative = Math.Round(cumulative + amount, 5)
+							          };
+
+						cumulative = ask.Cumulative;
+						futureDepth.Asks.Add(ask);
+					}
+				}
+				else if (itemList.Key == "bids")
+				{
+					foreach (var item in itemList.Value)
+					{
+						var amount = Math.Round(item.Last.Value<double>() * 100 / item.First.Value<double>(), 5);
+						var bid = new FutureDepthDetail
+							          {
+								          Price = item.First.Value<double>(),
+								          Amount = amount,
+								          Cumulative = Math.Round(cumulative + amount, 5)
+							          };
+
+						cumulative = bid.Cumulative;
+						futureDepth.Bids.Add(bid);
+					}
+				}
+			}
+
+			return futureDepth;
+		}
+
 		public async Task<FuturePosition> FuturePositionAsync(string symbol, string contractType)
 		{
 			var paras = new Dictionary<string, string>
@@ -275,61 +337,61 @@
 				// TODO: get AskBids in parallel thread
 				#region AskBids
 
-				var btcTwAskPrice = btcTwResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul);
-				var btcNwAskPrice = btcNwResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul);
-				var btcQAskPrice = btcQResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul);
-				var btcTwBidsPrice = btcTwResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul);
-				var btcNwBidsPrice = btcNwResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul);
-				var btcQBidsPrice = btcQResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul);
+				var btcTwAskPrice = btcTwResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul / btcTwResult.Asks.First().Price);
+				var btcNwAskPrice = btcNwResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul / btcNwResult.Asks.First().Price);
+				var btcQAskPrice = btcQResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul / btcQResult.Asks.First().Price);
+				var btcTwBidsPrice = btcTwResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul / btcTwResult.Bids.First().Price);
+				var btcNwBidsPrice = btcNwResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul / btcNwResult.Bids.First().Price);
+				var btcQBidsPrice = btcQResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul / btcQResult.Bids.First().Price);
 
-				var ltcTwAskPrice = ltcTwResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul);
-				var ltcNwAskPrice = ltcNwResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul);
-				var ltcQAskPrice = ltcQResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul);
-				var ltcTwBidsPrice = ltcTwResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul);
-				var ltcNwBidsPrice = ltcNwResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul);
-				var ltcQBidsPrice = ltcQResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul);
+				var ltcTwAskPrice = ltcTwResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul / ltcTwResult.Asks.First().Price);
+				var ltcNwAskPrice = ltcNwResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul / ltcNwResult.Asks.First().Price);
+				var ltcQAskPrice = ltcQResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul / ltcQResult.Asks.First().Price);
+				var ltcTwBidsPrice = ltcTwResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul / ltcTwResult.Bids.First().Price);
+				var ltcNwBidsPrice = ltcNwResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul / ltcNwResult.Bids.First().Price);
+				var ltcQBidsPrice = ltcQResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul / ltcQResult.Bids.First().Price);
 
-				var ethTwAskPrice = ethTwResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul);
-				var ethNwAskPrice = ethNwResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul);
-				var ethQAskPrice = ethQResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul);
-				var ethTwBidsPrice = ethTwResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul);
-				var ethNwBidsPrice = ethNwResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul);
-				var ethQBidsPrice = ethQResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul);
+				var ethTwAskPrice = ethTwResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul / ethTwResult.Asks.First().Price);
+				var ethNwAskPrice = ethNwResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul / ethNwResult.Asks.First().Price);
+				var ethQAskPrice = ethQResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul / ethQResult.Asks.First().Price);
+				var ethTwBidsPrice = ethTwResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul / ethTwResult.Bids.First().Price);
+				var ethNwBidsPrice = ethNwResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul / ethNwResult.Bids.First().Price);
+				var ethQBidsPrice = ethQResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul / ethQResult.Bids.First().Price);
 
-				var etcTwAskPrice = etcTwResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul);
-				var etcNwAskPrice = etcNwResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul);
-				var etcQAskPrice = etcQResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul);
-				var etcNwBidsPrice = etcNwResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul);
-				var etcTwBidsPrice = etcTwResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul);
-				var etcQBidsPrice = etcQResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul);
+				var etcTwAskPrice = etcTwResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul / etcTwResult.Asks.First().Price);
+				var etcNwAskPrice = etcNwResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul / etcNwResult.Asks.First().Price);
+				var etcQAskPrice = etcQResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul / etcQResult.Asks.First().Price);
+				var etcNwBidsPrice = etcNwResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul / etcNwResult.Bids.First().Price);
+				var etcTwBidsPrice = etcTwResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul / etcTwResult.Bids.First().Price);
+				var etcQBidsPrice = etcQResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul / etcQResult.Bids.First().Price);
 
-				var bchTwAskPrice = bchTwResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul);
-				var bchNwAskPrice = bchNwResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul);
-				var bchQAskPrice = bchQResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul);
-				var bchTwBidsPrice = bchTwResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul);
-				var bchNwBidsPrice = bchNwResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul);
-				var bchQBidsPrice = bchQResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul);
+				var bchTwAskPrice = bchTwResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul / bchTwResult.Asks.First().Price);
+				var bchNwAskPrice = bchNwResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul / bchNwResult.Asks.First().Price);
+				var bchQAskPrice = bchQResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul / bchQResult.Asks.First().Price);
+				var bchTwBidsPrice = bchTwResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul / bchTwResult.Bids.First().Price);
+				var bchNwBidsPrice = bchNwResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul / bchNwResult.Bids.First().Price);
+				var bchQBidsPrice = bchQResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul / bchQResult.Bids.First().Price);
 
-				var btgTwAskPrice = btgTwResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul);
-				var btgNwAskPrice = btgNwResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul);
-				var btgQAskPrice = btgQResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul);
-				var btgNwBidsPrice = btgNwResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul);
-				var btgTwBidsPrice = btgTwResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul);
-				var btgQBidsPrice = btgQResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul);
+				var btgTwAskPrice = btgTwResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul / btgTwResult.Asks.First().Price);
+				var btgNwAskPrice = btgNwResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul / btgNwResult.Asks.First().Price);
+				var btgQAskPrice = btgQResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul / btgQResult.Asks.First().Price);
+				var btgNwBidsPrice = btgNwResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul / btgNwResult.Bids.First().Price);
+				var btgTwBidsPrice = btgTwResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul / btgTwResult.Bids.First().Price);
+				var btgQBidsPrice = btgQResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul / btgQResult.Bids.First().Price);
 
-				var xrpTwAskPrice = xrpTwResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul);
-				var xrpNwAskPrice = xrpNwResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul);
-				var xrpQAskPrice = xrpQResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul);
-				var xrpTwBidsPrice = xrpTwResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul);
-				var xrpNwBidsPrice = xrpNwResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul);
-				var xrpQBidsPrice = xrpQResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul);
+				var xrpTwAskPrice = xrpTwResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul / xrpTwResult.Asks.First().Price);
+				var xrpNwAskPrice = xrpNwResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul / xrpNwResult.Asks.First().Price);
+				var xrpQAskPrice = xrpQResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul / xrpQResult.Asks.First().Price);
+				var xrpTwBidsPrice = xrpTwResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul / xrpTwResult.Bids.First().Price);
+				var xrpNwBidsPrice = xrpNwResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul / xrpNwResult.Bids.First().Price);
+				var xrpQBidsPrice = xrpQResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul / xrpQResult.Bids.First().Price);
 
-				var eosTwAskPrice = eosTwResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul);
-				var eosNwAskPrice = eosNwResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul);
-				var eosQAskPrice = eosQResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul);
-				var eosNwBidsPrice = eosNwResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul);
-				var eosTwBidsPrice = eosTwResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul);
-				var eosQBidsPrice = eosQResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul);
+				var eosTwAskPrice = eosTwResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul / eosTwResult.Asks.First().Price);
+				var eosNwAskPrice = eosNwResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul / eosNwResult.Asks.First().Price);
+				var eosQAskPrice = eosQResult.Asks.FirstOrDefault(x => x.Cumulative >= cumul / eosQResult.Asks.First().Price);
+				var eosNwBidsPrice = eosNwResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul / eosNwResult.Bids.First().Price);
+				var eosTwBidsPrice = eosTwResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul / eosTwResult.Bids.First().Price);
+				var eosQBidsPrice = eosQResult.Bids.FirstOrDefault(x => x.Cumulative >= cumul / eosQResult.Bids.First().Price);
 
 				#endregion
 
