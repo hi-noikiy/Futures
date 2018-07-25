@@ -25,7 +25,7 @@
 			worker.DoWork += WorkerDoWork;
 		}
 
-		public async void WorkerDoWork(object sender, DoWorkEventArgs e)
+		public void WorkerDoWork(object sender, DoWorkEventArgs e)
 		{
 			while (true)
 			{
@@ -39,48 +39,48 @@
 
 				var marketDepth = Convert.ToInt32(ConfigurationManager.AppSettings["MarketDepth"]);
 
-				var btcTwResult = await FutureDepthBtcAsync("btc_usd", "this_week", marketDepth);
-				var btcNwResult = await FutureDepthBtcAsync("btc_usd", "next_week", marketDepth);
-				var btcQResult = await FutureDepthBtcAsync("btc_usd", "quarter", marketDepth);
+				var btcTwResult = FutureDepthBtcAsync("btc_usd", "this_week", marketDepth);
+				var btcNwResult = FutureDepthBtcAsync("btc_usd", "next_week", marketDepth);
+				var btcQResult = FutureDepthBtcAsync("btc_usd", "quarter", marketDepth);
 
-				var ltcTwResult = await FutureDepthAsync("ltc_usd", "this_week", marketDepth);
-				var ltcNwResult = await FutureDepthAsync("ltc_usd", "next_week", marketDepth);
-				var ltcQResult = await FutureDepthAsync("ltc_usd", "quarter", marketDepth);
+				var ltcTwResult = FutureDepthAsync("ltc_usd", "this_week", marketDepth);
+				var ltcNwResult = FutureDepthAsync("ltc_usd", "next_week", marketDepth);
+				var ltcQResult = FutureDepthAsync("ltc_usd", "quarter", marketDepth);
 
-				var ethTwResult = await FutureDepthAsync("eth_usd", "this_week", marketDepth);
-				var ethNwResult = await FutureDepthAsync("eth_usd", "next_week", marketDepth);
-				var ethQResult = await FutureDepthAsync("eth_usd", "quarter", marketDepth);
+				var ethTwResult = FutureDepthAsync("eth_usd", "this_week", marketDepth);
+				var ethNwResult = FutureDepthAsync("eth_usd", "next_week", marketDepth);
+				var ethQResult = FutureDepthAsync("eth_usd", "quarter", marketDepth);
 
-				var etcTwResult = await FutureDepthAsync("etc_usd", "this_week", marketDepth);
-				var etcNwResult = await FutureDepthAsync("etc_usd", "next_week", marketDepth);
-				var etcQResult = await FutureDepthAsync("etc_usd", "quarter", marketDepth);
+				var etcTwResult = FutureDepthAsync("etc_usd", "this_week", marketDepth);
+				var etcNwResult = FutureDepthAsync("etc_usd", "next_week", marketDepth);
+				var etcQResult = FutureDepthAsync("etc_usd", "quarter", marketDepth);
 
-				var bchTwResult = await FutureDepthAsync("bch_usd", "this_week", marketDepth);
-				var bchNwResult = await FutureDepthAsync("bch_usd", "next_week", marketDepth);
-				var bchQResult = await FutureDepthAsync("bch_usd", "quarter", marketDepth);
+				var bchTwResult = FutureDepthAsync("bch_usd", "this_week", marketDepth);
+				var bchNwResult = FutureDepthAsync("bch_usd", "next_week", marketDepth);
+				var bchQResult = FutureDepthAsync("bch_usd", "quarter", marketDepth);
 
-				var btgTwResult = await FutureDepthAsync("btg_usd", "this_week", marketDepth);
-				var btgNwResult = await FutureDepthAsync("btg_usd", "next_week", marketDepth);
-				var btgQResult = await FutureDepthAsync("btg_usd", "quarter", marketDepth);
+				var btgTwResult = FutureDepthAsync("btg_usd", "this_week", marketDepth);
+				var btgNwResult = FutureDepthAsync("btg_usd", "next_week", marketDepth);
+				var btgQResult = FutureDepthAsync("btg_usd", "quarter", marketDepth);
 
-				var xrpTwResult = await FutureDepthAsync("xrp_usd", "this_week", marketDepth);
-				var xrpNwResult = await FutureDepthAsync("xrp_usd", "next_week", marketDepth);
-				var xrpQResult = await FutureDepthAsync("xrp_usd", "quarter", marketDepth);
+				var xrpTwResult = FutureDepthAsync("xrp_usd", "this_week", marketDepth);
+				var xrpNwResult = FutureDepthAsync("xrp_usd", "next_week", marketDepth);
+				var xrpQResult = FutureDepthAsync("xrp_usd", "quarter", marketDepth);
 
-				var eosTwResult = await FutureDepthAsync("eos_usd", "this_week", marketDepth);
-				var eosNwResult = await FutureDepthAsync("eos_usd", "next_week", marketDepth);
-				var eosQResult = await FutureDepthAsync("eos_usd", "quarter", marketDepth);
+				var eosTwResult = FutureDepthAsync("eos_usd", "this_week", marketDepth);
+				var eosNwResult = FutureDepthAsync("eos_usd", "next_week", marketDepth);
+				var eosQResult = FutureDepthAsync("eos_usd", "quarter", marketDepth);
 
 				#endregion
 
-				UpdateLabels(btcTwResult, btcNwResult, btcQResult
-							,ltcTwResult, ltcNwResult, ltcQResult
-							,ethTwResult, ethNwResult, ethQResult
-							,etcTwResult, etcNwResult, etcQResult
-							,bchTwResult, bchNwResult, bchQResult
-							,btgTwResult, btgNwResult, btgQResult
-							,xrpTwResult, xrpNwResult, xrpQResult
-							,eosTwResult, eosNwResult, eosQResult);
+				UpdateLabels(btcTwResult.Result, btcNwResult.Result, btcQResult.Result
+							,ltcTwResult.Result, ltcNwResult.Result, ltcQResult.Result
+							,ethTwResult.Result, ethNwResult.Result, ethQResult.Result
+							,etcTwResult.Result, etcNwResult.Result, etcQResult.Result
+							,bchTwResult.Result, bchNwResult.Result, bchQResult.Result
+							,btgTwResult.Result, btgNwResult.Result, btgQResult.Result
+							,xrpTwResult.Result, xrpNwResult.Result, xrpQResult.Result
+							,eosTwResult.Result, eosNwResult.Result, eosQResult.Result);
 			}		 
 		}
 
